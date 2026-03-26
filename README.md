@@ -22,7 +22,7 @@ Este proyecto es una API backend para un e-commerce que incluye gestión de usua
 
 ---
 
-## Tecnologías y Patrones Utilizados
+## Tecnologías y Patrones Utilizados.
 
 - **Node.js + Express**
 - **MongoDB + Mongoose** (con `populate` y `lean`)
@@ -34,7 +34,7 @@ Este proyecto es una API backend para un e-commerce que incluye gestión de usua
 
 ---
 
-## Estructura del Proyecto (src/)
+## Estructura del Proyecto. (src/)
 
 src/
 
@@ -52,29 +52,29 @@ src/
     └── utils.js
 
 
-## Instalación y Ejecución
+## Instalación y Ejecución.
 
-1. **Clonar el repositorio**
+1. **Clonar el repositorio.**
    ```bash
    git clone https://github.com/sanchezign/Backend2-EntregaFinal.git
    cd Backend2-EntregaFinal
 
 
-Instalar dependencias
+2.Instalar dependencias.
 
       npm install
 
-Configurar variables de entorno
+3.Configurar variables de entorno.
 
     Copia el archivo .env.example a .env
     Completa las variables con tus datos (MongoDB Atlas, credenciales de Gmail, etc.)      
 
-Iniciar el servidor
+4.Iniciar el servidor.
 
     npm run dev
     El servidor correrá en http://localhost:8080
 
-Variables de Entorno (.env)    
+**Variables de Entorno. (.env)    **
 
 PORT=8080
        
@@ -83,9 +83,9 @@ PORT=8080
     EMAIL_USER=tu_email@gmail.com
     EMAIL_PASS=tu_contraseña_de_aplicacion_de_google
 
- Endpoints Principales   
+ **Endpoints Principales.  ** 
 
-   Método,Ruta,Descripción,Autorización
+   Método / Ruta / Descripción / Autorización.
    
     POST,/api/sessions/register,Registro de usuario,Pública
     POST,/api/sessions/login,Login + JWT en cookie,Pública
