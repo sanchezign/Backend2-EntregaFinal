@@ -37,18 +37,19 @@ Este proyecto es una API backend para un e-commerce que incluye gestión de usua
 ## Estructura del Proyecto (src/)
 
 src/
-├── config/              → Configuraciones (DB, Passport, Mailer)
-├── dao/
-│   ├── classes/         → Clases DAO (acceso directo a la base de datos)
-│   └── models/          → Esquemas de Mongoose
-├── dtos/                → Data Transfer Objects
-├── managers/            → Gestores (capa legacy)
-├── middlewares/         → Middlewares de autenticación y autorización
-├── repositories/        → Repositorios (capa de abstracción)
-├── routes/              → Definición de rutas
-├── views/               → Plantillas Handlebars
-├── app.js
-└── utils.js
+
+    ├── config/              → Configuraciones (DB, Passport, Mailer)
+    ├── dao/
+    │   ├── classes/         → Clases DAO (acceso directo a la base de datos)
+    │   └── models/          → Esquemas de Mongoose
+    ├── dtos/                → Data Transfer Objects
+    ├── managers/            → Gestores (capa legacy)
+    ├── middlewares/         → Middlewares de autenticación y autorización
+    ├── repositories/        → Repositorios (capa de abstracción)
+    ├── routes/              → Definición de rutas
+    ├── views/               → Plantillas Handlebars
+    ├── app.js
+    └── utils.js
 
 
 ## Instalación y Ejecución
