@@ -1,0 +1,138 @@
+<h2>Productos con Paginación</h2>
+
+{{#if docs.length}}
+  <table style="width:100%; border-collapse: collapse; margin: 1rem 0;">
+    <thead>
+      <tr style="background:#f4f4f4;">
+        <th style="padding:8px; border:1px solid #ddd;">Título</th>
+        <th style="padding:8px; border:1px solid #ddd;">Precio</th>
+        <th style="padding:8px; border:1px solid #ddd;">Stock</th>
+        <th style="padding:8px; border:1px solid #ddd;">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each docs}}
+        <tr data-pid="{{this._id}}">
+          <td style="padding:8px; border:1px solid #ddd;">{{this.title}}</td>
+          <td style="padding:8px; border:1px solid #ddd;">${{this.price}}</td>
+          <td style="padding:8px; border:1px solid #ddd;">{{this.stock}}</td>
+          <td style="padding:8px; border:1px solid #ddd;">
+            <a href="/products/{{this._id}}">Ver detalle</a>
+
+            {{#if ../cartId}}
+              |
+              <button onclick="agregarAlCarrito('{{this._id}}')">Agregar al carrito</button>
+            {{else}}
+              <span style="color: #888;">(Inicia sesión para agregar)</span>
+            {{/if}}
+
+            {{#if ../isAdmin}}
+              |
+              <button onclick="eliminarProducto('{{this._id}}')" style="color: red; background: #ffebee; border: 1px solid #ef5350; padding: 4px 8px; cursor: pointer;">
+                Eliminar
+              </button>
+            {{/if}}
+          </td>
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
+{{else}}
+  <p>No hay productos para mostrar en esta página.</p>
+{{/if}}
+
+<!-- Paginación -->
+<div style="margin: 2rem 0; text-align: center;">
+  {{#if hasPrevPage}}
+    <a href="{{prevLink}}" style="margin:0 1rem; padding:8px 16px; background:#3498db; color:white; border-radius:4px; text-decoration:none;">← Anterior</a>
+  {{else}}
+    <span style="margin:0 1rem; padding:8px 16px; background:#ccc; color:#555; border-radius:4px;">← Anterior</span>
+  {{/if}}
+
+  <span style="font-weight:bold; margin:0 1rem;">Página {{page}} de {{totalPages}}</span>
+
+  {{#if hasNextPage}}
+    <a href="{{nextLink}}" style="margin:0 1rem; padding:8px 16px; background:#3498db; color:white; border-radius:4px; text-decoration:none;">Siguiente →</a>
+  {{else}}
+    <span style="margin:0 1rem; padding:8px 16px; background:#ccc; color:#555; border-radius:4px;">Siguiente →</span>
+  {{/if}}
+</div>
+
+<!-- Socket.IO y lógica de acciones -->
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  // Conectar Socket.IO enviando el token JWT desde la cookie
+  const token = document.cookie.split('coderCookieToken=')[1]?.split(';')[0] || '';
+  const socket = io({ auth: { token } });
+
+  // Función para agregar al carrito (usando fetch)
+  async function agregarAlCarrito(pid) {
+    const cartId = "{{cartId}}";
+    if (!cartId) {
+      alert("Debes iniciar sesión para agregar productos al carrito");
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/carts/${cartId}/product/${pid}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ quantity: 1 })
+      });
+
+      if (response.ok) {
+        alert("¡Producto agregado al carrito!");
+        socket.emit('cartUpdated', { cartId, pid }); // Opcional: notificar actualización
+      } else {
+        const err = await response.json();
+        alert("Error: " + (err.message || "No se pudo agregar"));
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error de conexión");
+    }
+  }
+
+  // Función para eliminar producto (solo admin)
+  async function eliminarProducto(pid) {
+    if (!confirm("¿Realmente quieres eliminar este producto?")) return;
+
+    try {
+      const response = await fetch(`/api/products/${pid}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      if (response.ok) {
+        alert("Producto eliminado correctamente");
+        // Remover fila de la tabla
+        document.querySelector(`tr[data-pid="${pid}"]`)?.remove();
+        // Notificar a todos los clientes conectados
+        socket.emit('productDeleted', { id: pid });
+      } else {
+        const err = await response.json();
+        alert("Error al eliminar: " + (err.message || "Acceso denegado"));
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error de conexión");
+    }
+  }
+
+  // Escuchar eventos globales (opcional - para actualizar la vista en tiempo real)
+  socket.on('newProduct', (product) => {
+    console.log('Nuevo producto agregado en tiempo real:', product);
+    // Aquí podrías agregar una nueva fila dinámicamente a la tabla si querés
+  });
+
+  socket.on('productDeleted', ({ id }) => {
+    console.log('Producto eliminado en tiempo real:', id);
+    // Remover fila si existe
+    const row = document.querySelector(`tr[data-pid="${id}"]`);
+    if (row) row.remove();
+  });
+
+  socket.on('error', ({ message }) => {
+    alert("Error desde el servidor: " + message);
+  });
+</script>
