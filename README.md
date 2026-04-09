@@ -1,37 +1,39 @@
 # Backend II - Entrega Final
 
-Entrega final del curso Backend II. Implementación completa de una **API REST de e-commerce** con arquitectura profesional.
+Implementación completa de una **API REST para e-commerce** con arquitectura profesional, patrones de diseño y seguridad avanzada.
 
+![Node.js](https://img.shields.io/badge/Node.js-20.x-green)
+![Express](https://img.shields.io/badge/Express-4.18-blue)
+![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-green)
+![Mongoose](https://img.shields.io/badge/Mongoose-8.x-orange)
 ---
 
 ## Descripción del Proyecto
 
-Este proyecto es una API backend para un e-commerce que incluye gestión de usuarios, productos, carritos y compras. Se destaca por su **arquitectura limpia y escalable** utilizando los patrones **Repository + DAO**, **DTO** y middlewares de autorización por roles.
+Este proyecto es una API backend completa para un e-commerce que incluye gestión de usuarios, productos, carritos y finalización de compras. Se destaca por su **arquitectura limpia y escalable** utilizando los patrones **Repository + DAO**, **DTO** y middlewares de autorización por roles.
 
 ### Objetivos Cumplidos ✓
 
 - Patrón **Repository + DAO** implementado correctamente
-- Uso de **DTO** en la ruta `/current` (sin exponer datos sensibles)
+- Uso de **DTO** en la ruta `/current` (sin exponer información sensible)
 - Sistema completo de **recuperación de contraseña** por email (token de 1 hora + validación de no repetir contraseña anterior)
 - Middleware de autorización por roles (`admin` y `user`)
 - Solo **admin** puede crear, actualizar y eliminar productos
 - Solo usuarios logueados pueden agregar productos al carrito
 - Modelo `Ticket` con lógica robusta de finalización de compra
-- Paginación profesional en productos
-- Vistas con **Handlebars**
-
+- Paginación profesional en productos con Handlebars
+- Vistas funcionales y responsivas
 ---
 
 ## Tecnologías y Patrones Utilizados.
 
 - **Node.js + Express**
-- **MongoDB + Mongoose** (con `populate` y `lean`)
+- **MongoDB Atlas + Mongoose** (con `populate` y `lean`)
 - **JWT + Passport** (autenticación con cookies `httpOnly`)
 - **Nodemailer** (recuperación de contraseña)
 - **Patrones de diseño**: Repository Pattern + DAO + DTO
 - **Handlebars** para vistas del lado del servidor
 - **Middleware** de autorización por roles
-
 ---
 
 ## Estructura del Proyecto. (src/)
@@ -39,15 +41,14 @@ Este proyecto es una API backend para un e-commerce que incluye gestión de usua
 src/
 
     ├── config/              → Configuraciones (DB, Passport, Mailer)
-    ├── dao/
-    │   ├── classes/         → Clases DAO (acceso directo a la base de datos)
-    │   └── models/          → Esquemas de Mongoose
+    ├── dao/                 → Capa de acceso directo a datos
     ├── dtos/                → Data Transfer Objects
-    ├── managers/            → Gestores (capa legacy)
     ├── middlewares/         → Middlewares de autenticación y autorización
-    ├── repositories/        → Repositorios (capa de abstracción)
+    ├── models/              → Esquemas de Mongoose
+    ├── repositories/        → Capa de lógica de negocio (Repository Pattern)
     ├── routes/              → Definición de rutas
     ├── views/               → Plantillas Handlebars
+    ├── public/              → Archivos estáticos
     ├── app.js
     └── utils.js
 
@@ -76,12 +77,11 @@ src/
 
 **Variables de Entorno. (.env)    **
 
-PORT=8080
-       
-    MONGO_URL=tu_string_de_conexion_mongodb_atlas
+    PORT=8080
+    MONGO_URL=mongodb+srv://<usuario>:<contraseña>@cluster0.xxx.mongodb.net/backend-entrega-final?retryWrites=true&w=majority
     JWT_SECRET=tu_clave_secreta_muy_larga_y_segura
     EMAIL_USER=tu_email@gmail.com
-    EMAIL_PASS=tu_contraseña_de_aplicacion_de_google
+    EMAIL_PASS=tu_contraseña_de_aplicación_de_google
 
  **Endpoints Principales.  ** 
 
