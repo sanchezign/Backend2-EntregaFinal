@@ -49,7 +49,7 @@ router.delete('/:cid/product/:pid', passport.authenticate('current', { session: 
   }
 });
 
-// Ver carrito (público o con auth opcional)
+// Ver detalle de carrito
 router.get('/:cid', async (req, res) => {
   try {
     const cart = await cartManager.getById(req.params.cid);
