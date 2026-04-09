@@ -6,7 +6,7 @@ class CurrentUserDTO {
     this.email = user.email;
     this.age = user.age;
     this.role = user.role;
-    this.cart = user.cart?._id || null;
+    this.cart = user.cart?._id || null;   // Solo el ID del carrito, no el objeto completo
   }
 }
 
