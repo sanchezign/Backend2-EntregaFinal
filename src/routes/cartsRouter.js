@@ -1,69 +1,62 @@
 import { Router } from 'express';
 import passport from 'passport';
 import { authorization } from '../middlewares/authorization.js';
-import cartController from '../controllers/CartController.js';
+import CartManager from '../managers/CartManager.js';
 
 const router = Router();
+const cartManager = CartManager.getInstance();
 
-// GET /api/carts - Lista todos los carritos (solo admin)
-router.get('/', passport.authenticate('current', { session: false }), authorization('admin'), async (req, res) => {
-  try {
-    const carts = await cartController.getAll();
-    res.json({ status: 'success', payload: carts });
-  } catch (error) {
-    res.status(500).json({ status: 'error', message: error.message || 'Error al obtener carritos' });
-  }
-});
-
-// POST /api/carts - Crea un carrito vacío
+// Crear carrito vacío (público)
 router.post('/', async (req, res) => {
   try {
-    const newCart = await cartController.create();
-    res.status(201).json({ status: 'success', message: 'Carrito creado exitosamente', payload: newCart });
+    const newCart = await cartManager.create();
+    res.status(201).json({
+      status: 'success',
+      message: 'Carrito creado',
+      payload: newCart
+    });
   } catch (error) {
-    res.status(500).json({ status: 'error', message: error.message || 'Error al crear carrito' });
+    res.status(500).json({ status: 'error', message: error.message });
   }
 });
 
-// GET /api/carts/:cid
-router.get('/:cid', async (req, res) => {
-  try {
-    const cart = await cartController.getById(req.params.cid);
-    if (!cart) return res.status(404).json({ status: 'error', message: 'Carrito no encontrado' });
-    res.json({ status: 'success', payload: cart });
-  } catch (error) {
-    res.status(500).json({ status: 'error', message: error.message || 'Error al obtener carrito' });
-  }
-});
-
-// POST /api/carts/:cid/product/:pid
+// Agregar producto al carrito (solo usuarios logueados)
 router.post('/:cid/product/:pid', passport.authenticate('current', { session: false }), authorization('user'), async (req, res) => {
   try {
     const quantity = req.body.quantity || 1;
-    const updatedCart = await cartController.addProduct(req.params.cid, req.params.pid, quantity);
-    res.json({ status: 'success', message: 'Producto agregado al carrito', payload: updatedCart });
+    const updatedCart = await cartManager.addProduct(req.params.cid, req.params.pid, quantity);
+    res.json({
+      status: 'success',
+      message: 'Producto agregado al carrito',
+      payload: updatedCart
+    });
   } catch (error) {
-    res.status(400).json({ status: 'error', message: error.message || 'Error al agregar producto' });
+    res.status(400).json({ status: 'error', message: error.message });
   }
 });
 
-// DELETE /api/carts/:cid/product/:pid
+// Eliminar producto del carrito (solo usuarios logueados)
 router.delete('/:cid/product/:pid', passport.authenticate('current', { session: false }), authorization('user'), async (req, res) => {
   try {
-    const updatedCart = await cartController.removeProduct(req.params.cid, req.params.pid);
-    res.json({ status: 'success', message: 'Producto eliminado del carrito', payload: updatedCart });
+    const updatedCart = await cartManager.removeProduct(req.params.cid, req.params.pid);
+    res.json({
+      status: 'success',
+      message: 'Producto eliminado del carrito',
+      payload: updatedCart
+    });
   } catch (error) {
-    res.status(400).json({ status: 'error', message: error.message || 'Error al eliminar producto' });
+    res.status(400).json({ status: 'error', message: error.message });
   }
 });
 
-// PUT /api/carts/:cid
-router.put('/:cid', passport.authenticate('current', { session: false }), authorization('user'), async (req, res) => {
+// Ver carrito (público o con auth opcional)
+router.get('/:cid', async (req, res) => {
   try {
-    const updatedCart = await cartController.updateProducts(req.params.cid, req.body.products);
-    res.json({ status: 'success', message: 'Carrito actualizado', payload: updatedCart });
+    const cart = await cartManager.getById(req.params.cid);
+    if (!cart) return res.status(404).json({ status: 'error', message: 'Carrito no encontrado' });
+    res.json({ status: 'success', payload: cart });
   } catch (error) {
-    res.status(400).json({ status: 'error', message: error.message || 'Error al actualizar carrito' });
+    res.status(500).json({ status: 'error', message: error.message });
   }
 });
 
