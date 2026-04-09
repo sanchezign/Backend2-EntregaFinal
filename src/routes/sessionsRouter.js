@@ -72,24 +72,18 @@ router.post('/login', async (req, res) => {
       maxAge: 24 * 60 * 60 * 1000
     });
 
-    res.json({
-      status: 'success',
-      message: 'Login exitoso'
-    });
+    res.json({ status: 'success', message: 'Login exitoso' });
   } catch (error) {
     console.error('[POST /login] Error:', error.message);
     res.status(500).json({ status: 'error', message: error.message });
   }
 });
 
-// ==================== CURRENT (con DTO estricto) ====================
+// ==================== CURRENT (DTO estricto) ====================
 router.get('/current', passport.authenticate('current', { session: false }), async (req, res) => {
   try {
     const userDTO = await userRepository.getCurrentUser(req.user._id);
-    res.json({
-      status: 'success',
-      user: userDTO
-    });
+    res.json({ status: 'success', user: userDTO });
   } catch (error) {
     console.error('[GET /current] Error:', error.message);
     res.status(500).json({ status: 'error', message: error.message });
@@ -97,35 +91,26 @@ router.get('/current', passport.authenticate('current', { session: false }), asy
 });
 
 // ==================== RECUPERACIÓN DE CONTRASEÑA ====================
-// 1. Olvidé mi contraseña → enviar email
 router.post('/forgot-password', async (req, res) => {
   try {
     const { email } = req.body;
     const user = await userRepository.getByEmail(email);
-
-    if (!user) {
-      return res.status(404).json({ status: 'error', message: 'Usuario no encontrado' });
-    }
+    if (!user) return res.status(404).json({ status: 'error', message: 'Usuario no encontrado' });
 
     const token = crypto.randomBytes(32).toString('hex');
-
     user.resetToken = token;
     user.resetTokenExpiration = Date.now() + 3600000; // 1 hora
     await user.save();
 
     await sendRecoveryEmail(email, token);
-
-    res.json({
-      status: 'success',
-      message: 'Correo de recuperación enviado'
-    });
+    res.json({ status: 'success', message: 'Correo de recuperación enviado' });
   } catch (error) {
     console.error('[POST /forgot-password] Error:', error.message);
     res.status(500).json({ status: 'error', message: error.message });
   }
 });
 
-// 2. Resetear contraseña con token
+// Resetear contraseña
 router.post('/reset-password/:token', async (req, res) => {
   try {
     const { token } = req.params;
@@ -135,8 +120,7 @@ router.post('/reset-password/:token', async (req, res) => {
       return res.status(400).json({ status: 'error', message: 'Nueva contraseña es requerida' });
     }
 
-    const user = await userRepository.getByEmailForReset(token); // Necesitas agregar este método
-
+    const user = await userRepository.getByEmailForReset(token);
     if (!user || user.resetToken !== token || user.resetTokenExpiration < Date.now()) {
       return res.status(400).json({ status: 'error', message: 'Token inválido o expirado' });
     }
@@ -149,16 +133,12 @@ router.post('/reset-password/:token', async (req, res) => {
       });
     }
 
-    // Actualizar contraseña
     user.password = bcrypt.hashSync(newPassword, 10);
     user.resetToken = undefined;
     user.resetTokenExpiration = undefined;
     await user.save();
 
-    res.json({
-      status: 'success',
-      message: 'Contraseña actualizada correctamente'
-    });
+    res.json({ status: 'success', message: 'Contraseña actualizada correctamente' });
   } catch (error) {
     console.error('[POST /reset-password] Error:', error.message);
     res.status(500).json({ status: 'error', message: error.message });
