@@ -1,17 +1,18 @@
-import userDao from '../dao/classes/UserDao.js';
+import userDao from '../dao/UserDao.js';
 import CurrentUserDTO from '../dtos/CurrentUserDTO.js';
 
 class UserRepository {
-  async getAll() {
-    return await userDao.getAll();
-  }
-
   async getById(id) {
     return await userDao.findById(id);
   }
 
   async getByEmail(email) {
     return await userDao.findByEmail(email);
+  }
+
+  // Método específico para recuperación de contraseña
+  async getByEmailForReset(token) {
+    return await userDao.findOne({ resetToken: token });
   }
 
   async create(userData) {
